@@ -7,4 +7,4 @@ export const CreateUserInput = z.object({
   avatar: z.string().url().optional()
 })
 
-export type User = z.infer<typeof CreateUserInput>
+export type UserInput = z.infer<typeof CreateUserInput>
