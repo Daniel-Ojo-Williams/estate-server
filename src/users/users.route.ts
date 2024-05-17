@@ -10,5 +10,6 @@ const userController = new AuthController(userService);
 
 router.post('/api/v1/register', validate(CreateUserInput), userController.signUp.bind(userController));
 router.post('/api/v1/login', validate(loginInput), userController.login.bind(userController));
+router.get('/api/v1/logout', userController.logout.bind(userController));
 
 export default router;

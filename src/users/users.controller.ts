@@ -37,7 +37,7 @@ class AuthController {
       const { password: userPassword, ...data } = user;
 
       const token = generateToken({ sub: user.id, email: user.email, username: user.username });
-      
+
       return res.cookie('token', token).status(HttpCode.OK).json({ error: false, message: 'Fetched users successfully', data })
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -45,6 +45,18 @@ class AuthController {
           .status(HttpCode.INTERNAL_SERVER_ERROR)
           .json({ error: true, message: error.message });
     }
+    }
+  }
+
+  logout(req: Request, res: Response) {
+    try {
+      res.clearCookie('token').status(HttpCode.OK).json({ error: false, message: 'Logged out successfully', data: {} });
+    } catch (error) {
+            if (error instanceof Error) {
+              res
+                .status(HttpCode.INTERNAL_SERVER_ERROR)
+                .json({ error: true, message: error.message });
+            }
     }
   }
 }
