@@ -1,7 +1,9 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
+import { type Request, type Response } from 'express-serve-static-core';
 import cors from 'cors';
 import { HttpCode } from './constants';
-import { logger } from '../config/logger';
+import { logger } from './config/logger';
+import AuthRoutes from './users/users.route';
 
 export class Server {
   private readonly app = express();
@@ -14,6 +16,14 @@ export class Server {
 
     this.app.get('/', (req: Request, res: Response) => {
         res.status(HttpCode.OK).json({ error: false, message: 'Welcome to the estate api' });
+    })
+    
+    this.app.use(AuthRoutes);
+
+
+
+    this.app.all('*', (req: Request, res: Response) => {
+      res.status(HttpCode.NOT_FOUND).json({ error: true, message: 'You have used an Invalid endpoint or method, please check and try again' })
     })
 
     this.app.listen(this.port, () => {
