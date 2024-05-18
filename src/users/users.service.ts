@@ -2,7 +2,7 @@ import { UserInput } from "./user.validator";
 import { prisma } from "../config/client";
 import CustomError from "../helpers/customError";
 import { HttpCode } from "../constants";
-import { IUserService } from "./users.types";
+import { IUserService } from "../types";
 import type { User } from "@prisma/client";
 
 export class UserService implements IUserService{
@@ -40,6 +40,24 @@ export class UserService implements IUserService{
 
     return user;
   }
+
+  async findUserByUsername(username: string): Promise<User | null> {
+    const user = await prisma.user.findUnique({
+      where: { username }
+    })
+
+    return user;
+  }
+
+  async updateUserProfile(id: string, data: Partial<User>): Promise<User | null> {
+    const user = await prisma.user.update({
+      where: { id },
+      data,      
+    });
+
+    return user;
+  }
+  
 }
 
 

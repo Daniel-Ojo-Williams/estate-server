@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 import { HttpCode } from "../constants/index";
 import { type UserInput } from "./user.validator";
-import { IUserService } from "./users.types";
+import { IUserService } from "../types";
 import bcrypt from 'bcrypt';
 import { generateToken } from '../helpers/token';
 
@@ -23,10 +23,10 @@ class AuthController {
     }
   }
 
-  async login(req: Request<{}, {}, Pick<UserInput, "email" | "password">>, res: Response) {
+  async login(req: Request<{}, {}, Pick<UserInput, "username" | "password">>, res: Response) {
     try {
-      const { email, password } = req.body;
-      const user = await this.userService.findUserByEmail(email);
+      const { username, password } = req.body;
+      const user = await this.userService.findUserByUsername(username);
 
       if (!user) return res.status(HttpCode.NOT_FOUND).json({ error: true, message: 'Invalid credentials, please check and try again' });
 
@@ -52,11 +52,31 @@ class AuthController {
     try {
       res.clearCookie('token').status(HttpCode.OK).json({ error: false, message: 'Logged out successfully', data: {} });
     } catch (error) {
-            if (error instanceof Error) {
-              res
-                .status(HttpCode.INTERNAL_SERVER_ERROR)
-                .json({ error: true, message: error.message });
-            }
+      if (error instanceof Error) {
+        res
+          .status(HttpCode.INTERNAL_SERVER_ERROR)
+          .json({ error: true, message: error.message });
+      }
+    }
+  }
+
+  async updateProfile(req: Request<{}, {}, UserInput>, res: Response) {
+    try {
+      const { email, username, avatar } = req.body;
+      const { id } = res.locals.user;
+      const user = await this.userService.updateUserProfile(id, { email, username, avatar });
+      
+      if (!user) return res.status(HttpCode.BAD_REQUEST).json({ error: true, message: 'Error, user not found' });
+
+      const { password, ...data } = user;
+
+      return res.status(HttpCode.OK).json({ error: false, message: 'Updated user successfully', data });
+    } catch (error) {
+      if (error instanceof Error) {
+        res
+          .status(HttpCode.INTERNAL_SERVER_ERROR)
+          .json({ error: true, message: error.message });
+      }
     }
   }
 }

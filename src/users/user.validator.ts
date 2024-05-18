@@ -7,7 +7,7 @@ export const CreateUserInput = z.object({
   avatar: z.string().url().optional()
 })
 
-export const loginInput = CreateUserInput.pick({ email: true, password: true });
+export const loginInput = CreateUserInput.pick({ username: true, password: true });
 
 export type UserInput = z.infer<typeof CreateUserInput>
 
