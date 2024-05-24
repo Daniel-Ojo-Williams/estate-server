@@ -5,14 +5,20 @@ import { HttpCode } from '../constants/index';
 const validate = (schema: AnyZodObject) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      const body = schema.parse(req.body);
-      req.body = body;
+      if (req.method === 'GET') {
+        const query = req.query && schema.parse(req.query);
+        req.query = query;
+      } else {
+        const body = req.body && schema.parse(req.body);
+        req.body = body;
+      }
       next();
     } catch (error: any) {
       if (error instanceof ZodError) {
-        const message = error.issues.map(issue => {
-            const errorMessage = issue.message;
-            const errorField = issue.path[0];
+        const message = error.errors.map(error => {
+            const errorMessage = error.message;
+            const pathLength = error.path.length;
+            const errorField = error.path[pathLength - 1];
             return { [errorField]: errorMessage }
           })
           return res.status(HttpCode.BAD_REQUEST).json({ error: true, message });
