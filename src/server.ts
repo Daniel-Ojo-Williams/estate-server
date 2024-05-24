@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { HttpCode } from './constants';
 import { logger } from './config/logger';
 import AuthRoutes from './users/users.route';
+import PostRoutes from './posts/post.router';
 
 export class Server {
   private readonly app = express();
@@ -24,6 +25,7 @@ export class Server {
     })
     
     this.app.use(AuthRoutes);
+    this.app.use(PostRoutes);
 
 
 
