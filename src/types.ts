@@ -1,5 +1,5 @@
 import { UserInput } from "./users/user.validator";
-import { type User, type Post, Prisma, PostDetails } from "@prisma/client";
+import { type User, type Post, Prisma, PostDetails, SavedPosts } from "@prisma/client";
 import type { PostInput, PostQuery } from "./posts/post.validator";
 
 export interface IUserService {
@@ -12,12 +12,14 @@ export interface IUserService {
 
 export interface IPostService {
   getAllPosts: (query?: PostQuery) => Promise<Post[]>;
-  getSinglePost: (id: string) => Promise<Post | null>;
+  getSinglePost: (id: string, userId?: string) => Promise<Post & { isSaved: boolean } | null>;
   createPost: (
     userId: string,
     postData: PostInput["postData"],
     postDetails: PostDetails
   ) => Promise<Post>;
+  savePost: (postId: string, userId: string) => Promise<boolean>;
+  profilePosts: (userId: string) => Promise<{ myPosts: Array<Post>; savedPosts: Array<Post> }>; 
   updatePost: (
     postId: string,
     userId: string,

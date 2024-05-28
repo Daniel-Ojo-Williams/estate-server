@@ -25,7 +25,7 @@ class PostService implements IPostService {
     return Posts;
   }
 
-  async getSinglePost(id: string) {
+  async getSinglePost(id: string, userId?: string) {
     const post = await prisma.post.findUnique({
       where: { id }, include: {
         postDetails: true,
@@ -33,7 +33,54 @@ class PostService implements IPostService {
       }
     });
 
-    return post;
+    if (!post) return null;
+
+    let isSaved = false;
+
+    if (userId) {
+      isSaved = !!await prisma.savedPosts.findUnique({
+        where: {
+          userId_postId: {
+            userId,
+            postId: id
+          }
+        }
+      })
+    }
+
+    return { ...post, isSaved };
+  }
+
+  async savePost(postId: string, userId: string) {
+    // --| Check if post have been saved for user already
+    const saved = await prisma.savedPosts.findUnique({
+      where: {
+        userId_postId: {
+          postId,
+          userId
+        }
+      }
+    });
+
+    if (saved) {
+      // --| If post is already saved for user, then unsave it
+      await prisma.savedPosts.delete({ where: { id: saved.id } })
+      return false;
+    } else {
+      // --| Else save it
+      await prisma.savedPosts.create({ data: { postId, userId } })
+      return true;
+    }
+  }
+
+  async profilePosts(userId: string) {
+    const userPosts = await prisma.post.findMany({ where: { userId } });
+
+    const savedPosts = await prisma.savedPosts.findMany({ where: { userId }, include: { post: true } });
+
+    const _savedPosts = savedPosts.map(post => post.post);
+
+    return { myPosts: userPosts, savedPosts: _savedPosts }
   }
 
   async createPost(

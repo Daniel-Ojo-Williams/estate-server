@@ -10,13 +10,17 @@ const postController = new PostController(PostService);
 
 // Get all posts
 router.get('/api/v1/posts', validate(PostQuery), postController.getAllPosts.bind(postController));
+// Get user posts
+router.get('/api/v1/profile/posts', authMid, postController.profilePosts.bind(postController));
 // Get single post
 router.get('/api/v1/post/:id', postController.getSinglePost.bind(postController));
 // Create a new post - Only authenticated user
 router.post('/api/v1/post', authMid, validate(PostInput), postController.createPost.bind(postController));
+// Save post
+router.post('/api/v1/post/save', authMid, postController.savePost.bind(postController));
 // Update post
-router.patch('/api/v1/post/:id', postController.updatePost.bind(postController));
+router.patch('/api/v1/post/:id', authMid, postController.updatePost.bind(postController));
 // Delete post
-router.delete('/api/v1/post/:id', postController.deletePost.bind(postController));
+router.delete('/api/v1/post/:id', authMid, postController.deletePost.bind(postController));
 
 export default router;

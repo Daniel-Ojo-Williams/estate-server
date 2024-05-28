@@ -13,5 +13,6 @@ router.post('/api/v1/register', validate(CreateUserInput), userController.signUp
 router.post('/api/v1/login', validate(loginInput), userController.login.bind(userController));
 router.post('/api/v1/logout', userController.logout.bind(userController));
 router.patch('/api/v1/profile', authMid, validate(CreateUserInput), userController.updateProfile.bind(userController));
+router.get('/api/v1/profile/posts', authMid, )
 
 export default router;
